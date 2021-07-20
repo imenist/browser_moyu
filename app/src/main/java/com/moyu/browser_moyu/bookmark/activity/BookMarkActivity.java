@@ -9,15 +9,18 @@ import androidx.appcompat.widget.Toolbar;
 
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 
+import com.moyu.browser_moyu.MainActivity;
 import com.moyu.browser_moyu.R;
 import com.moyu.browser_moyu.bookmark.adapter.BookMarkAdapter;
 import com.moyu.browser_moyu.db.MyDataBase;
@@ -77,7 +80,13 @@ public class BookMarkActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BookmarkRecord bookmarkRecord = bookmarkRecordList.get(position);
+                String url = bookmarkRecord.getUrl();
 
+                Intent intent = new Intent(BookMarkActivity.this, MainActivity.class);
+                intent.putExtra("url",url);
+                intent.putExtra("useOther",4);
+                startActivity(intent);
             }
         });
 
