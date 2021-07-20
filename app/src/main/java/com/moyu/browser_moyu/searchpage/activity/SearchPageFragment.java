@@ -361,20 +361,33 @@ public class SearchPageFragment extends Fragment implements View.OnClickListener
         }
 
         private void addImageClickListener(WebView view) {
-            view.loadUrl("javascript:(function(){" +
-                    "var objs = document.getElementsByTagName(\"img\"); " +
-                    //  "for(var i=0;i<objs.length;i++)" +
-                    // "{"
-                    // + "   window.imagelistener.showSource(objs[i].src);  "
-                    //+"}"+
-                    "window.imagelistener.showSource(document.getElementsByTagName('html')[0].innerHTML);"
-                    +
-                    "for(var i=0;i<objs.length;i++)  " +
-                    "{"
-                    + "    objs[i].onclick=function()  " +
-                    "    {  "
-                    + "        window.imagelistener.openImage(this.src);  " +//通过js代码找到标签为img的代码块，设置点击的监听方法与本地的openImage方法进行连接
-                    "    }  " +
+            view.loadUrl("javascript:(function(){"
+                    +"var objs = document.getElementsByTagName(\"img\"); "
+                    +"window.imagelistener.setNewArray();"
+                    +"var Expression=/https:\\/\\/([\\w-]+\\.)+[\\w-]+(\\/[\\w- .\\/?%&=]*)?/;"
+                    +"var objExp=new RegExp(Expression);"
+                    +"var array=new Array();"
+                    +"var j = 0;"
+                    + "for(var i=0;i<objs.length;i++)"
+                    +"{"
+                    +   "if(objExp.test(objs[i].src))"
+                    +  "{"
+                    +    "array[j++] = objs[i];"
+                    +  "   window.imagelistener.showSource(objs[i].src);  "
+                    +   "}"
+                    +"}"
+                   // "window.imagelistener.showSource(document.getElementsByTagName('html')[0].innerHTML);"
+                    +"for(var i=0;i<array.length;i++)  "
+                    +"{"
+                    + "    array[i].onclick=function()  "
+                    +"    {  "
+                  //  +       "var Expression2=/https:\\/\\/([\\w-]+\\.)+[\\w-]+(\\/[\\w- .\\/?%&=]*)?/;"
+                   // +       " var objExp2=new RegExp(Expression);"
+                    +       "if(objExp.test(this.src))"
+                    +       "{"
+                    +           "window.imagelistener.openImage(this.src);  "
+                    +       "}"
+                    +"    }  " +
                     "}" +
                     "})()");
         }
@@ -475,6 +488,10 @@ public class SearchPageFragment extends Fragment implements View.OnClickListener
                             e.printStackTrace();
                         }
                         input = "https://www.baidu.com/s?wd=" + input + "&ie=UTF-8";
+                    }
+
+                    if(!(input.startsWith("http") || input.startsWith("https"))){
+                        input = "https://" + input;
                     }
                     webView.loadUrl(input);
 

@@ -42,15 +42,20 @@ public class JavascriptInterface {
     }
 
     @android.webkit.JavascriptInterface
-    public void showSource(String html){
-        Log.i(TAG,"html---"+html);
+    public void setNewArray() {
+       this.imageSrc = new ArrayList<>();
+    }
+    @android.webkit.JavascriptInterface
+    public void showSource(String src){
+        Log.i(TAG,"html---"+src);
         //imageSrc = GetImageUtils.getImageSrc(GetImageUtils.getImageUrl(html));
         //imageSrc.add(html);
-        imageSrc = GetImageUtils.returnImageUrlsFromHtml(html);
+        //imageSrc = GetImageUtils.returnImageUrlsFromHtml(html);
         /*
         if(null!=listner){
             listner.getImageList(imageSrc);
         }*/
+        imageSrc.add(src);
         for(String s :imageSrc){
             Log.i(TAG,s);
         }

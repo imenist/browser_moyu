@@ -46,11 +46,13 @@ import android.widget.Toast;
 
 import com.google.android.material.datepicker.CompositeDateValidator;
 import com.moyu.browser_moyu.R;
+import com.moyu.browser_moyu.bookmark.activity.BookMarkActivity;
 import com.moyu.browser_moyu.databinding.FragmentNavigationListBinding;
 import com.moyu.browser_moyu.db.viewmodel.BookmarkRecordViewModel;
 import com.moyu.browser_moyu.history.activity.HistoryRecordActivity;
 import com.moyu.browser_moyu.navigationlist.viewmodel.NavSearViewModel;
 import com.moyu.browser_moyu.navigationlist.viewmodel.NavigationListViewModel;
+import com.moyu.browser_moyu.newspage.activity.NewsPageActivity;
 import com.moyu.browser_moyu.searchpage.activity.SearchPageFragment;
 
 import java.lang.reflect.Field;
@@ -89,14 +91,16 @@ public class NavigationListFragment extends Fragment implements View.OnClickList
 //    private NavigationListViewModel navigationListViewModel;
 
     //Dialog
-    private String[] menu_name_array = {"历史记录", "书签", "加入书签", "新建窗口"};
-    private int[] menu_image_array = {R.drawable.history1, R.drawable.bookmark, R.drawable.add_bookmark, R.drawable.add_web};
+    private String[] menu_name_array = {"历史记录", "书签", "加入书签", "资讯"};
+    private int[] menu_image_array = {R.drawable.history1, R.drawable.bookmark, R.drawable.add_bookmark,
+            R.drawable.news};
 
     //DialogItem
     private final int ITEM_HISTORY = 0;
     private final int ITEM_BOOKMARK = 1;
     private final int ITEM_ADD_BOOKMARK = 2;
-    private final int ITEM_CREATE_WINDOW = 3;
+    //    private final int ITEM_CREATE_WINDOW = 3;
+    private final int ITEM_NEWS = 3;
 
     //与SearchPageFragment通信
     private NavSearViewModel viewModel;
@@ -154,16 +158,18 @@ public class NavigationListFragment extends Fragment implements View.OnClickList
                     //查看历史记录
                     case ITEM_HISTORY:
                         menuDialog.dismiss();
-                        Intent intent = new Intent(getActivity(), HistoryRecordActivity.class);
-                        startActivity(intent);
+                        Intent toHistory = new Intent(getActivity(), HistoryRecordActivity.class);
+                        startActivity(toHistory);
                         break;
                     //查看书签
                     case ITEM_BOOKMARK:
                         menuDialog.dismiss();
-
+                        Intent toBookmark = new Intent(getActivity(), BookMarkActivity.class);
+                        startActivity(toBookmark);
                         break;
                     //加入书签
                     case ITEM_ADD_BOOKMARK:
+                        menuDialog.dismiss();
                         //获得WebView的title和url
                         String title = webView.getTitle();
                         String url = webView.getUrl();
@@ -172,17 +178,21 @@ public class NavigationListFragment extends Fragment implements View.OnClickList
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe()
                         );
-                        menuDialog.dismiss();
                         break;
                     //创建窗口
-                    case ITEM_CREATE_WINDOW:
+//                    case ITEM_CREATE_WINDOW:
+//                        menuDialog.dismiss();
+//                        //保存当前Fragment数据
+//
+//                        //创建一个新的Fragment
+//
+//                        //新Fragment加载主页
+//
+//                        break;
+                    case ITEM_NEWS:
                         menuDialog.dismiss();
-                        //保存当前Fragment数据
-
-                        //创建一个新的Fragment
-
-                        //新Fragment加载主页
-
+                        Intent toNews = new Intent(getActivity(), NewsPageActivity.class);
+                        startActivity(toNews);
                         break;
                 }
             }
@@ -219,10 +229,12 @@ public class NavigationListFragment extends Fragment implements View.OnClickList
         mDisposable = new CompositeDisposable();
     }
 
+    //菜单
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.add("menu");
     }
 
+    //菜单
     private SimpleAdapter getMenuAdapter(String[] menuNameArray,
                                          int[] imageResourceArray) {
         ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();

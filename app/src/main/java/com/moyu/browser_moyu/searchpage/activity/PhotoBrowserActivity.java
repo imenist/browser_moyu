@@ -38,7 +38,7 @@ public class PhotoBrowserActivity extends Activity implements View.OnClickListen
     private TextView photoOrderTv;
     private TextView saveTv;
     private String curImageUrl = "";
-    private ArrayList<String> imageUrls = new ArrayList(){};
+    private ArrayList<String> imageUrls;
 
     private int curPosition = -1;
     private int[] initialedPositions = null;
