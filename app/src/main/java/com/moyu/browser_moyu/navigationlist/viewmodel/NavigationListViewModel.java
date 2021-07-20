@@ -1,23 +1,7 @@
 package com.moyu.browser_moyu.navigationlist.viewmodel;
 
-import android.app.Application;
-import android.content.Context;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Window;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.BindingAdapter;
-import androidx.lifecycle.ViewModel;
-
-import com.moyu.browser_moyu.MainActivity;
-import com.moyu.browser_moyu.R;
-import com.moyu.browser_moyu.navigationlist.activity.NavigationListFragment;
 
 public class NavigationListViewModel {
 

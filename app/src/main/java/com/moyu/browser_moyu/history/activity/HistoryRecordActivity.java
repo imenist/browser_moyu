@@ -2,7 +2,7 @@ package com.moyu.browser_moyu.history.activity;
 
 
 import android.content.DialogInterface;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
@@ -19,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.moyu.browser_moyu.MainActivity;
 import com.moyu.browser_moyu.R;
 import com.moyu.browser_moyu.db.MyDataBase;
 import com.moyu.browser_moyu.db.entity.HistoryRecord;
@@ -82,7 +83,15 @@ public class HistoryRecordActivity extends AppCompatActivity {
 
         //Item短按跳转至网页
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            ;
+            HistoryRecord historyRecord = historyList.get(position);
+            String url = historyRecord.url;
+
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("url", url);
+            intent.putExtra("useOther", 4);
+            startActivity(intent);
+
+
         });
 
         //Item长按删除选项
@@ -205,9 +214,6 @@ public class HistoryRecordActivity extends AppCompatActivity {
         }
 
     }
-
-
-
 
 
 }

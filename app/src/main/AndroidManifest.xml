@@ -19,7 +19,9 @@
         <activity android:name=".searchpage.activity.PhotoBrowserActivity"></activity>
         <activity android:name=".history.activity.HistoryRecordActivity" />
         <activity android:name=".newspage.activity.NewsPageActivity"/>
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTask">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

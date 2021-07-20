@@ -1,18 +1,19 @@
 package com.moyu.browser_moyu;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.view.View;
-import android.widget.Button;
+import android.view.KeyEvent;
 
-import com.moyu.browser_moyu.history.activity.HistoryRecordActivity;
-import com.moyu.browser_moyu.searchpage.activity.SearchPageFragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.moyu.browser_moyu.navigationlist.viewmodel.NavSearViewModel;
+
+import static android.view.KeyEvent.KEYCODE_BACK;
 
 public class MainActivity extends AppCompatActivity {
 
+    private NavSearViewModel navSearViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +24,37 @@ public class MainActivity extends AppCompatActivity {
 //                    .add(R.id.fragment_search_page, SearchPageFragment.class, null)
 //                    .commit();
 //        }
+        navSearViewModel = new ViewModelProvider(this).get(NavSearViewModel.class);
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //唤醒阶段通知viewModel设置url传入标志
+        Intent intent = getIntent();
+        int uesOther = 0;
+        if(intent != null){
+            uesOther = intent.getIntExtra("useOther", 0);
+        }
+        navSearViewModel.getData().setUseOther(uesOther);
+    }
+
+    //获得新的intent
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    //将返回键消费掉，防止直接推出
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KEYCODE_BACK ){
+            navSearViewModel.getData().setGoBack(1);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }

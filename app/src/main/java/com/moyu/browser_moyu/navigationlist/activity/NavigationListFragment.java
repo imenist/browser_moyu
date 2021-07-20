@@ -1,65 +1,44 @@
 package com.moyu.browser_moyu.navigationlist.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.appcompat.view.menu.MenuPopupHelper;
-import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ObservableField;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-
-import android.text.SpannableStringBuilder;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.datepicker.CompositeDateValidator;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.moyu.browser_moyu.R;
 import com.moyu.browser_moyu.bookmark.activity.BookMarkActivity;
 import com.moyu.browser_moyu.databinding.FragmentNavigationListBinding;
 import com.moyu.browser_moyu.db.viewmodel.BookmarkRecordViewModel;
 import com.moyu.browser_moyu.history.activity.HistoryRecordActivity;
 import com.moyu.browser_moyu.navigationlist.viewmodel.NavSearViewModel;
-import com.moyu.browser_moyu.navigationlist.viewmodel.NavigationListViewModel;
 import com.moyu.browser_moyu.newspage.activity.NewsPageActivity;
 import com.moyu.browser_moyu.searchpage.activity.SearchPageFragment;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
