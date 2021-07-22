@@ -72,6 +72,7 @@ public class APIutil {
     private static final String base_pageToken = "&pageToken=";
 
     private static int pageToken;
+
     private static String currentKeyWord = "";
 
     public static String getCurrentKeyWord() {
@@ -79,6 +80,11 @@ public class APIutil {
     }
 
     private static final String TAG = "APIutil";
+
+    public static int getCurrentPageToken() {
+        return pageToken-1;
+    }
+
 
     /**
      * 输入新的关键词时，调用第三方API，获取新的新闻

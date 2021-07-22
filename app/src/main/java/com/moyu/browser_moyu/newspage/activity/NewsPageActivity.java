@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.moyu.browser_moyu.MainActivity;
@@ -27,28 +24,44 @@ import com.moyu.browser_moyu.newspage.util.APIutil;
 import com.moyu.browser_moyu.newspage.util.NewsListViewAdapter;
 import com.moyu.browser_moyu.newspage.viewmodel.NewsPageViewModel;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.zip.Inflater;
+import java.util.Set;
+
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class NewsPageActivity extends AppCompatActivity {
 
     private NewsPageViewModel mNewsPageViewModel;
-    private ListView news_list;
-    private EditText news_keyWord;
-    private Button news_search;
+    private ListView news_list;                         // 列表view
+    private EditText news_keyWord;                      // 关键词编辑框view
+    private Button news_search;                         // 搜索按钮view
     private NewsListViewAdapter newsListViewAdapter;
-    private List<Link> urlAndTitle;
+    private List<Link> latestUrlAndTitle;               // 最新返回的url和title
+    View footview;                                      // list底部view
+    Button news_nextpage;                               // 下一页按钮
 
-    private void initBindView() {
+    private void init() {
         news_list = findViewById(R.id.news_list);
         news_keyWord = findViewById(R.id.news_keyWord);
         news_search = findViewById(R.id.news_search);
+        mNewsPageViewModel = new NewsPageViewModel();
+
+        footview = LayoutInflater.from(NewsPageActivity.this).inflate(R.layout.news_list_footer, null);
+        news_nextpage = footview.findViewById(R.id.news_nextpage);
     }
 
     private static final String TAG = "NewsPageActivity";
 
-    private void setListener() {
+    private void setListenerForEnterKeyWord() {
         // 设置焦点监听器
         news_keyWord.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -89,13 +102,13 @@ public class NewsPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (news_keyWord.hasFocus()) {
-
                     // 隐藏软键盘
                     if (manager.isActive()) {
                         manager.hideSoftInputFromWindow(news_keyWord.getApplicationWindowToken(), 0);
                     }
-
                     news_keyWord.clearFocus();
+                } else {
+                    mNewsPageViewModel.getKeyWord().setValue(news_keyWord.getText().toString());
                 }
             }
         });
@@ -113,25 +126,19 @@ public class NewsPageActivity extends AppCompatActivity {
         }
 
         // 绑定view对象
-        initBindView();
+        init();
 
         // view绑定监听器
-        setListener();
+        setListenerForEnterKeyWord();
 
-        View footview = LayoutInflater.from(NewsPageActivity.this).inflate(R.layout.news_list_footer, null);
-        Button news_nextpage = footview.findViewById(R.id.news_nextpage);
         news_nextpage.setVisibility(View.INVISIBLE);
         news_list.addFooterView(footview);
-
-        mNewsPageViewModel = new NewsPageViewModel();
 
 
         news_nextpage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                urlAndTitle = APIutil.getNewsPage(APIutil.getCurrentKeyWord());
-                mNewsPageViewModel.getUrlAndTitle().setValue(urlAndTitle);
+                mNewsPageViewModel.getKeyWord().setValue(news_keyWord.getText().toString());
             }
         });
 
@@ -143,31 +150,33 @@ public class NewsPageActivity extends AppCompatActivity {
                 news_nextpage.setVisibility(View.VISIBLE);
                 news_nextpage.setText("加载中……");
 
-                urlAndTitle = APIutil.getNewsPage(newKeyWord);
+                cleanList();
 
-                mNewsPageViewModel.getUrlAndTitle().setValue(urlAndTitle);
+                startRefreshEventFlow(newKeyWord);
+
             }
         });
+
 
         mNewsPageViewModel.getUrlAndTitle().observe(this, new Observer<List<Link>>() {
             @Override
             public void onChanged(List<Link> links) {
 
-                if (newsListViewAdapter!=null) {
-                    newsListViewAdapter.clearList();
-                    newsListViewAdapter.notifyDataSetChanged();
-                }
+                cleanList();
 
                 newsListViewAdapter = new NewsListViewAdapter(NewsPageActivity.this, R.layout.news_list_item, links);
                 news_list.setAdapter(newsListViewAdapter);
 
-                news_nextpage.setText("下一页");
+                if (latestUrlAndTitle.size() == 0) {
+                    news_nextpage.setText("无相关资讯");
+                } else {
+                    news_nextpage.setText("下一页");
+                }
+
             }
         });
 
-
         // ListView 每个item点击事件
-        // TODO 点击访问URL链接
         news_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -181,6 +190,51 @@ public class NewsPageActivity extends AppCompatActivity {
             }
         });
 
+        // 预留关键词
+        news_keyWord.setText("热搜");
+        mNewsPageViewModel.getKeyWord().setValue(news_keyWord.getText().toString());
+
     }
 
+    /**
+     * 清除显示的链接
+     */
+    private void cleanList() {
+        if (newsListViewAdapter!=null) {
+            newsListViewAdapter.clearList();
+            newsListViewAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * 使用RxJava异步调用API
+     * @param keyWord
+     */
+    private void startRefreshEventFlow(String keyWord) {
+        Observable.just(keyWord)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new io.reactivex.Observer<String>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(@NotNull String s) {
+                latestUrlAndTitle = APIutil.getNewsPage(s);
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                Toast.makeText(NewsPageActivity.this, "完成加载,当前 "+APIutil.getCurrentPageToken()+" 页", Toast.LENGTH_SHORT).show();
+                mNewsPageViewModel.getUrlAndTitle().setValue(latestUrlAndTitle);
+            }
+        });
+    }
 }
